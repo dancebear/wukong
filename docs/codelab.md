@@ -32,7 +32,7 @@
 
 文档抓取的技术很多，多到可以单独拿出来写一篇文章。幸运的是微博抓取相对简单，可以通过新浪提供的API实现的，而且已经有[Go语言的SDK](http://github.com/huichen/gobo)可以并发抓取并且速度相当快。
 
-我已经抓了大概十万篇微博放在了testdata/weibo_data.txt里，所以你就不需要自己做了。文件中每行存储了一篇微博，格式如下
+我已经抓了大概十万篇微博放在了testdata/weibo_data.txt里(因为影响git clone的下载速度所以删除了，请从[这里](https://github.com/huichen/wukong/blob/43f20b4c0921cc704cf41fe8653e66a3fcbb7e31/testdata/weibo_data.txt?raw=true)下载)，所以你就不需要自己做了。文件中每行存储了一篇微博，格式如下
 
     <微博id>||||<时间戳>||||<用户id>||||<用户名>||||<转贴数>||||<评论数>||||<喜欢数>||||<小图片网址>||||<大图片网址>||||<正文>
 
@@ -94,7 +94,7 @@ searcher.IndexDocument(docId, types.DocumentIndexData{
 })
 ```
 
-文档的docId必须唯一，对微博来说可以直接用微博的ID。悟空引擎允许你加入三种索引数据：
+文档的docId必须大于0且唯一，对微博来说可以直接用微博的ID。悟空引擎允许你加入三种索引数据：
 
 1. 文档的正文（content），会被分词为关键词（tokens）加入索引。
 2. 文档的关键词（tokens）。当正文为空的时候，允许用户绕过悟空内置的分词器直接输入文档关键词，这使得在引擎外部进行文档分词成为可能。
@@ -133,7 +133,7 @@ type WeiboScoringFields struct {
 type WeiboScoringCriteria struct {
 }
 
-func (criteria WeiboScoringCriteria) Score(
+func (criteria WeiboScoringCriteria) Score {
         doc types.IndexedDocument, fields interface{}) []float32 {
         if reflect.TypeOf(fields) != reflect.TypeOf(WeiboScoringFields{}) {
                 return []float32{}
@@ -180,7 +180,7 @@ response := searcher.Search(types.SearchRequest{
 
 	go run search_server.go
 
-等待终端中出现“索引了xxx条微博”的输出后，在浏览器中打开[http://localhost:8080](http://localhost:8080) 即可进入搜索页面，这实现了 http://soooweibo.com
+等待终端中出现“索引了xxx条微博”的输出后，在浏览器中打开[http://localhost:8080](http://localhost:8080) 即可进入搜索页面。
 
 如果你想进一步了解悟空引擎，建议你直接阅读代码。代码的目录结构如下：
 
